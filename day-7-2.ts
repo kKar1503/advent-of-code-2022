@@ -1098,7 +1098,6 @@ const dirTraversal = (input: string) => {
   let directoryDepth: Directory[] = [parentDirectory];
   const directoryList: Directory[] = [parentDirectory];
   for (let i = 1; i < inputArray.length; i++) {
-    console.log(inputArray[i]);
     const currentLine = inputArray[i];
     const currentDirectory = directoryDepth[directoryDepth.length - 1];
     if (currentLine.startsWith('$ ls')) {
@@ -1128,12 +1127,29 @@ const dirTraversal = (input: string) => {
       }
     }
   }
-  let total = 0;
+  const totalSpace = 70000000;
+  const targetSpace = 30000000;
+  const currentSpace = totalSpace - parentDirectory.size;
+  const targetDeletion = targetSpace - currentSpace;
+  console.log(
+    'target',
+    targetDeletion,
+    'current space',
+    currentSpace,
+    'parent',
+    parentDirectory.size
+  );
+  type BestTarget = { size: number; dir: Directory | null };
+  let best: BestTarget = { size: totalSpace, dir: null };
   directoryList.forEach((dir) => {
-    if (dir.size <= 100000) total += dir.size;
+    const deletionDifference = dir.size - targetDeletion;
+    if (deletionDifference >= 0 && deletionDifference < best.size) {
+      console.log(dir.dirName, dir.size, deletionDifference, best.size);
+      best = { size: deletionDifference, dir: dir };
+    }
   });
-  return total;
+  return best.dir!.size;
 };
 
-// console.log(dirTraversal(sampleInput));
+console.log(dirTraversal(sampleInput));
 console.log(dirTraversal(input));
